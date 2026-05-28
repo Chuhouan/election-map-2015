@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&family=Source+Sans+Pro:wght@400;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background-primary: #f8fafc;
+  --background-secondary: #ffffff;
+  --background-tertiary: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #94a3b8;
+  --border-color: #e2e8f0;
+  --accent-blue: #2563eb;
+  --accent-blue-light: #eff6ff;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--text-primary);
+  background: var(--background-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 自定义滚动条（亮色） */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* 工具类 */
+.text-glow {
+  text-shadow: 0 0 10px rgba(37, 99, 235, 0.15);
+}
+
+.border-subtle {
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.shadow-bbc {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* 地图相关 */
+.leaflet-container {
+  font-family: 'Inter', sans-serif;
+}
+
+/* 选区名称标签 - 地图标注风格：透明、衬线字体、白字描边 */
+.constituency-name-label {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  font-family: Georgia, 'Times New Roman', 'Noto Serif', serif !important;
+  font-size: var(--label-font-size, 10px) !important;
+  font-weight: 400 !important;
+  color: #0f172a !important;
+  white-space: nowrap !important;
+  pointer-events: none !important;
+  box-shadow: none !important;
+  /* 白色光晕描边，确保在彩色底图上可读 */
+  text-shadow:
+    -1px -1px 0 rgba(255,255,255,0.75),
+     1px -1px 0 rgba(255,255,255,0.75),
+    -1px  1px 0 rgba(255,255,255,0.75),
+     1px  1px 0 rgba(255,255,255,0.75);
+  opacity: var(--label-opacity, 1);
+  transition: font-size 0.25s ease-out, opacity 0.3s ease-out;
+}
+
+.constituency-name-label::before {
+  display: none !important;
+}
+
+/* 搜索下拉动画 */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInDown {
+  animation: fadeInDown 0.2s ease-out;
+}
