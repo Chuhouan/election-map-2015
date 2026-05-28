@@ -1,0 +1,9 @@
+1:"$Sreact.fragment"
+2:I[47257,["/election-map-2015/_next/static/chunks/17tlzmkgrth99.js","/election-map-2015/_next/static/chunks/0dbhjjzl8qfwv.js"],"ClientPageRoot"]
+3:I[31713,["/election-map-2015/_next/static/chunks/17tlzmkgrth99.js","/election-map-2015/_next/static/chunks/0dbhjjzl8qfwv.js","/election-map-2015/_next/static/chunks/0~rlow8fb8k~_.js","/election-map-2015/_next/static/chunks/17msixzq6elqs.js","/election-map-2015/_next/static/chunks/0d7txy5c6fjbh.js"],"default"]
+6:I[97367,["/election-map-2015/_next/static/chunks/17tlzmkgrth99.js","/election-map-2015/_next/static/chunks/0dbhjjzl8qfwv.js"],"OutletBoundary"]
+7:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/election-map-2015/_next/static/chunks/0~rlow8fb8k~_.js","async":true}],["$","script","script-1",{"src":"/election-map-2015/_next/static/chunks/17msixzq6elqs.js","async":true}],["$","script","script-2",{"src":"/election-map-2015/_next/static/chunks/0d7txy5c6fjbh.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"fwTP3R8Ac5tEEOWgmXE7_"}
+4:{}
+5:"$0:rsc:props:children:0:props:serverProvidedParams:params"
+8:null
