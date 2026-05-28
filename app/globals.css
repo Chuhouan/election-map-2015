@@ -76,26 +76,23 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
-/* 选区名称标签 - 地图标注风格：透明、衬线字体、白字描边 */
+/* 选区名称标签 - 地图标注风格 */
 .constituency-name-label {
   background: transparent !important;
   border: none !important;
   padding: 0 !important;
   font-family: Georgia, 'Times New Roman', 'Noto Serif', serif !important;
-  font-size: var(--label-font-size, 10px) !important;
   font-weight: 400 !important;
   color: #0f172a !important;
   white-space: nowrap !important;
   pointer-events: none !important;
   box-shadow: none !important;
-  /* 白色光晕描边，确保在彩色底图上可读 */
   text-shadow:
     -1px -1px 0 rgba(255,255,255,0.75),
      1px -1px 0 rgba(255,255,255,0.75),
     -1px  1px 0 rgba(255,255,255,0.75),
      1px  1px 0 rgba(255,255,255,0.75);
-  opacity: var(--label-opacity, 1);
-  transition: font-size 0.25s ease-out, opacity 0.3s ease-out;
+  opacity: 0.85;
 }
 
 .constituency-name-label::before {

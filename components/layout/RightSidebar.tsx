@@ -1,10 +1,12 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { MapPin, Users, Clock, TrendingUp, TrendingDown, BarChart3, Target, X, Award, Flag, Dot } from 'lucide-react'
+import { MapPin, Users, Clock, TrendingUp, TrendingDown, BarChart3, Target, X, Award, Flag } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { translateParty, translateRegion, translateNation } from '@/lib/i18n/translations'
 import { type Constituency2015, PARTY_COLORS_2015 } from '@/lib/data/constituencies-2015-real'
+import constituencyData from '@/lib/data/constituencies-2015-real'
+import { translateConName, translateCandName } from '@/lib/data/name-translations'
 
 interface RightSidebarProps {
   selectedConstituency?: Constituency2015 | null
@@ -33,32 +35,86 @@ export default function RightSidebar({ selectedConstituency }: RightSidebarProps
 // 空状态
 // ============================================================
 function EmptyState({ t }: { t: (key: any) => string }) {
+  const { partySeats, nationalTurnout: natTurnout } = (() => {
+    const partySeats: Record<string, number> = {}
+    let totalVotes2015 = 0, totalElectorate2015 = 0
+    constituencyData.forEach(c => {
+      partySeats[c.winner] = (partySeats[c.winner] || 0) + 1
+      totalVotes2015 += c.totalVotes
+      totalElectorate2015 += c.electorate
+    })
+    return {
+      partySeats,
+      nationalTurnout: totalElectorate2015 > 0 ? (totalVotes2015 / totalElectorate2015 * 100) : 66.1
+    }
+  })()
+
+  const topParties = [
+    { name: t('sidebar.con'), color: '#0087DC', seats: partySeats['Conservative'] || 0 },
+    { name: t('sidebar.lab'), color: '#DC241F', seats: partySeats['Labour'] || 0 },
+    { name: t('sidebar.snp'), color: '#F5DC00', seats: partySeats['SNP'] || 0 },
+    { name: t('sidebar.libdem'), color: '#FAA61A', seats: partySeats['Liberal Democrat'] || 0 },
+  ].sort((a, b) => b.seats - a.seats)
+
+  const maxSeats = topParties[0]?.seats || 1
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="p-6 flex flex-col items-center justify-center h-full text-center"
+      className="p-5 flex flex-col h-full"
     >
-      <MapPin className="w-14 h-14 text-slate-200 mb-5" />
-      <h2 className="text-lg font-bold text-slate-700 mb-2">{t('sidebar.analysis')}</h2>
-      <p className="text-sm text-slate-400 leading-relaxed max-w-64">
-        {t('sidebar.clickMapHint')}
-      </p>
-      <div className="mt-6 p-4 bg-slate-50 rounded-xl w-full">
-        <div className="text-xs text-slate-400 space-y-1.5">
-          <div className="flex items-center">
-            <Dot className="w-3 h-3 text-blue-400 mr-1" />
-            {t('sidebar.clickHintSeats')}
+      <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
+        {t('sidebar.national')} · 2015
+      </h2>
+
+      {/* Key stats row */}
+      <div className="grid grid-cols-2 gap-2 mb-5">
+        <div className="bg-slate-50 rounded-lg p-3 text-center">
+          <div className="text-[10px] text-slate-400 uppercase">{t('sidebar.conSeats')}</div>
+          <div className="text-xl font-bold text-[#0087DC] mt-0.5">{partySeats['Conservative'] || 330}</div>
+        </div>
+        <div className="bg-slate-50 rounded-lg p-3 text-center">
+          <div className="text-[10px] text-slate-400 uppercase">{t('sidebar.nationalTurnout')}</div>
+          <div className="text-xl font-bold text-slate-800 mt-0.5">{natTurnout.toFixed(1)}%</div>
+        </div>
+      </div>
+
+      {/* Party bar chart */}
+      <h3 className="text-xs font-medium text-slate-500 mb-3">{t('sidebar.parliament')} (650)</h3>
+      <div className="space-y-2 mb-5">
+        {topParties.map((p) => (
+          <div key={p.name} className="flex items-center space-x-2">
+            <span className="text-[11px] text-slate-600 w-16 flex-shrink-0">{p.name}</span>
+            <div className="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full"
+                style={{ width: `${(p.seats / 650) * 100}%`, backgroundColor: p.color }}
+              />
+            </div>
+            <span className="text-xs font-semibold text-slate-700 w-8 text-right flex-shrink-0">{p.seats}</span>
           </div>
-          <div className="flex items-center">
-            <Dot className="w-3 h-3 text-amber-400 mr-1" />
-            {t('sidebar.clickHintMargin')}
+        ))}
+        <div className="flex items-center space-x-2">
+          <span className="text-[11px] text-slate-400 w-16 flex-shrink-0">Others</span>
+          <div className="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full"
+              style={{ width: `${((650 - (partySeats['Conservative']||0) - (partySeats['Labour']||0) - (partySeats['SNP']||0) - (partySeats['Liberal Democrat']||0)) / 650) * 100}%`, backgroundColor: '#94a3b8' }}
+            />
           </div>
-          <div className="flex items-center">
-            <Dot className="w-3 h-3 text-emerald-400 mr-1" />
-            {t('sidebar.clickHintTurnout')}
-          </div>
+          <span className="text-xs font-semibold text-slate-400 w-8 text-right flex-shrink-0">23</span>
+        </div>
+      </div>
+
+      {/* Hint */}
+      <div className="mt-auto">
+        <div className="bg-blue-50 rounded-lg p-4 text-center">
+          <MapPin className="w-5 h-5 text-blue-400 mx-auto mb-2" />
+          <p className="text-xs text-slate-500 leading-relaxed">
+            {t('sidebar.clickMapHint')}
+          </p>
         </div>
       </div>
     </motion.div>
@@ -106,7 +162,7 @@ function ConstituencyDetail({ c, t, lang }: { c: Constituency2015; t: (key: any)
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
             <h2 className="text-lg font-bold text-slate-900 leading-tight truncate">
-              {c.name}
+              {lang === 'zh' ? translateConName(c.name) : c.name}
             </h2>
             <div className="flex items-center mt-1.5 space-x-1.5 text-xs text-slate-500">
               <span>{translateRegion(c.region, lang as any)}</span>
@@ -185,7 +241,7 @@ function ConstituencyDetail({ c, t, lang }: { c: Constituency2015; t: (key: any)
                   className="text-sm font-semibold truncate"
                   style={{ color: getPartyColor(winnerParty) }}
                 >
-                  {winnerCandidate?.name || '-'}
+                  {lang === 'zh' ? translateCandName(winnerCandidate?.name || '') : (winnerCandidate?.name || '-')}
                 </div>
                 <div className="text-[10px] text-slate-400 mt-0.5">
                   {winnerCandidate?.votes?.toLocaleString()} {t('general.votes')}
@@ -234,7 +290,7 @@ function ConstituencyDetail({ c, t, lang }: { c: Constituency2015; t: (key: any)
                       <div className="min-w-0">
                         <div className="flex items-center space-x-1.5">
                           <span className="text-sm font-medium text-slate-800 truncate">
-                            {cand.name}
+                            {lang === 'zh' ? translateCandName(cand.name) : cand.name}
                           </span>
                           {cand.isWinner && (
                             <Award className="w-3 h-3 text-amber-500 flex-shrink-0" />

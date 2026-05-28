@@ -85,18 +85,13 @@ export default function Header({ onSelectConstituency }: HeaderProps) {
         {/* 左侧：标题和选举信息 */}
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-3">
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center">
-                <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none">
-                  <rect width="32" height="32" rx="4" fill="#1e40af" />
-                  <text x="16" y="22" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="Inter">UK</text>
-                </svg>
-              </div>
-              <div className="h-6 w-px bg-slate-300"></div>
-              <h1 className="text-lg font-bold text-slate-800 tracking-tight">
-                {t('header.title')}
-              </h1>
-            </div>
+                <div className="flex items-center space-x-2">
+                  <div className="bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded tracking-wider">UK</div>
+                  <div className="h-5 w-px bg-slate-300"></div>
+                  <h1 className="text-base font-bold text-slate-800 tracking-tight">
+                    {t('header.title')}
+                  </h1>
+                </div>
 
             {/* 选举状态标签 */}
             <div className="flex items-center space-x-2">

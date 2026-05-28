@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { GeoJSON, TileLayer, ZoomControl } from 'react-leaflet'
+import { GeoJSON, ZoomControl } from 'react-leaflet'
 import { LeafletProvider, createLeafletContext } from '@react-leaflet/core'
 import type { LeafletContextInterface } from '@react-leaflet/core'
 import 'leaflet/dist/leaflet.css'
@@ -10,6 +10,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import MapControls from './MapControls'
 import MapTooltip from './MapTooltip'
 import constituencyData, { type Constituency2015, PARTY_COLORS_2015 } from '@/lib/data/constituencies-2015-real'
+import { translateConName, translateCandName } from '@/lib/data/name-translations'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 const allConstituenciesCount = 650
@@ -81,7 +82,7 @@ interface MapPanelProps {
 }
 
 export default function MapPanel({ onSelectConstituency, flyToConstituency }: MapPanelProps) {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const [mapMode, setMapMode] = useState<'seats' | 'margin' | 'turnout' | 'swing'>('seats')
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null)
   const [tooltipData, setTooltipData] = useState<any>(null)
@@ -93,21 +94,13 @@ export default function MapPanel({ onSelectConstituency, flyToConstituency }: Ma
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
   const lastFlownIdRef = useRef<number | null>(null)
-  const labelRefs = useRef<Map<string, L.Tooltip>>(new Map())
-
-  // 根据 zoom 计算字体大小：缩小视图标签更小，放大后逐渐变大
-  // zoom < 7 时隐藏标签（避免缩小视图时杂糅）
-  const getLabelStyle = useCallback((zoom: number) => {
-    if (zoom < 7) return { fontSize: 8, opacity: 0 }
-    // 从 zoom=7 开始显示，字体随放大指数增长
-    const fontSize = Math.round(Math.max(8, Math.min(22, 8 * Math.pow(1.18, zoom - 7))))
-    const opacity = zoom === 7 ? 0.65 : 1
-    return { fontSize, opacity }
-  }, [])
+  const nameMarkerRefs = useRef<L.Tooltip[]>([])
+  const showNamesRef = useRef(showNames)
+  showNamesRef.current = showNames
 
   // Load boundary GeoJSON data
   useEffect(() => {
-    fetch('/data/constituency-boundaries-merged.json')
+    fetch('/election-map-2015/data/constituency-boundaries-merged.json')
       .then(res => res.json())
       .then(data => {
         setBoundaryGeoJSON(data)
@@ -222,39 +215,77 @@ export default function MapPanel({ onSelectConstituency, flyToConstituency }: Ma
     }
   }, [getFeatureColor])
 
-  // 根据 zoom 级别动态调整标签字体和可见性
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-    const { fontSize, opacity } = getLabelStyle(currentZoom)
-    container.style.setProperty('--label-font-size', `${fontSize}px`)
-    container.style.setProperty('--label-opacity', String(opacity))
-  }, [currentZoom, getLabelStyle])
+  // Compute polygon centroid from its coordinates
+  function computeCentroid(coords: number[][]): [number, number] {
+    let cx = 0, cy = 0, count = 0
+    for (const c of coords) {
+      cx += c[0]; cy += c[1]; count++
+    }
+    return [cy / count, cx / count] // Leaflet [lat, lng]
+  }
 
-  // Handle showNames toggling
-  useEffect(() => {
-    if (!boundaryGeoJSON) return
-    labelRefs.current.forEach((tooltip) => {
-      tooltip.remove()
-    })
-    labelRefs.current.clear()
-  }, [boundaryGeoJSON, showNames, mapMode])
+  // Get centroid from GeoJSON feature geometry
+  function getFeatureCentroid(geometry: any): [number, number] {
+    if (geometry.type === 'Polygon') {
+      return computeCentroid(geometry.coordinates[0])
+    }
+    if (geometry.type === 'MultiPolygon') {
+      // Use the largest polygon
+      let best: [number, number] = [0, 0], bestArea = 0
+      for (const poly of geometry.coordinates) {
+        const area = poly[0].length
+        if (area > bestArea) {
+          bestArea = area
+          best = computeCentroid(poly[0])
+        }
+      }
+      return best
+    }
+    return [0, 0]
+  }
 
-  const onEachFeature = useCallback((feature: any, layer: any) => {
-    // Add or update name labels
-    if (showNames) {
-      const nameKey = feature.properties.name || feature.properties.boundaryName
-      const displayName = nameKey || ''
-      const tooltip = layer.bindTooltip(displayName, {
+  // Get label font size based on zoom
+  function getLabelFontSize(zoom: number): number {
+    if (zoom < 6) return 0
+    if (zoom < 7) return 8
+    return Math.round(Math.max(8, Math.min(20, 7 * Math.pow(1.2, zoom - 7))))
+  }
+
+  // Manage name markers: show/hide on toggle, update size on zoom
+  useEffect(() => {
+    if (!boundaryGeoJSON || !mapRef.current) return
+
+    // Remove old markers
+    nameMarkerRefs.current.forEach(m => m.remove())
+    nameMarkerRefs.current = []
+
+    if (!showNames) return
+
+    const map = mapRef.current
+    const fontSize = getLabelFontSize(currentZoom)
+
+    for (const feature of boundaryGeoJSON.features) {
+      const name = feature.properties?.name || feature.properties?.boundaryName
+      if (!name) continue
+      const displayName = lang === 'zh' ? translateConName(name) : name
+
+      const [lat, lng] = getFeatureCentroid(feature.geometry)
+
+      const tooltip = L.tooltip({
         permanent: true,
         direction: 'center',
         className: 'constituency-name-label',
         opacity: 0.85,
         interactive: false,
-      } as any)
-      labelRefs.current.set(String(feature.properties.code || Math.random()), tooltip)
+      })
+      tooltip.setLatLng([lat, lng])
+      tooltip.setContent(`<span style="font-size:${fontSize}px">${displayName}</span>`)
+      tooltip.addTo(map)
+      nameMarkerRefs.current.push(tooltip)
     }
+  }, [showNames, boundaryGeoJSON, mapMode, currentZoom, lang])
 
+  const onEachFeature = useCallback((feature: any, layer: any) => {
     layer.on({
       mouseover: (e: any) => {
         layer.setStyle({
@@ -300,7 +331,7 @@ export default function MapPanel({ onSelectConstituency, flyToConstituency }: Ma
         }
       },
     })
-  }, [getFeatureColor, onSelectConstituency, showNames])
+  }, [getFeatureColor, onSelectConstituency])
 
   const modeLabels: Record<string, string> = {
     seats: t('map.seats'),
@@ -356,13 +387,9 @@ export default function MapPanel({ onSelectConstituency, flyToConstituency }: Ma
         >
           {context && (
             <LeafletProvider value={context}>
-              <TileLayer
-                url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-              />
               {boundaryGeoJSON && !loadingBoundaries && (
                 <GeoJSON
-                  key={`${mapMode}-${showNames}`}
+                  key={mapMode}
                   data={boundaryGeoJSON}
                   style={polygonStyle}
                   onEachFeature={onEachFeature}
