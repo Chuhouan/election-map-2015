@@ -97,7 +97,7 @@ function EmptyState({ t }: { t: (key: any) => string }) {
           </div>
         ))}
         <div className="flex items-center space-x-2">
-          <span className="text-[11px] text-slate-400 w-16 flex-shrink-0">Others</span>
+          <span className="text-[11px] text-slate-400 w-16 flex-shrink-0">{t('party.others')}</span>
           <div className="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full"

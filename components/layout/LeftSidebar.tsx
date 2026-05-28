@@ -87,8 +87,8 @@ export default function LeftSidebar() {
             <div className="absolute top-0 bottom-0 border-r-2 border-red-400" style={{ left: `${(MAJORITY / TOTAL) * 100}%` }} />
           </div>
           <div className="flex justify-between mt-1.5 text-[10px] text-slate-400">
-            <span>{consSeats} seats</span>
-            <span>{MAJORITY} majority</span>
+            <span>{consSeats} {t('general.seats')}</span>
+            <span>{MAJORITY} {t('general.majority')}</span>
           </div>
         </div>
 
@@ -102,16 +102,27 @@ export default function LeftSidebar() {
             <div>
               <div className="flex items-center mb-2">
                 <Zap className="w-3.5 h-3.5 mr-1.5 text-amber-500" />
-                <h3 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Key Battlegrounds</h3>
+                <h3 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{t('general.keyBattlegrounds')}</h3>
               </div>
               <div className="space-y-1.5">
                 {top3.map((s, i) => (
                   <div key={i} className="flex items-center justify-between text-[11px] bg-red-50 rounded-md px-2.5 py-1.5">
                     <div className="min-w-0 flex-1">
                       <span className="font-medium text-slate-700 truncate block">{s.name}</span>
-                      <span className="text-[9px] text-red-500">Maj. {s.majority.toLocaleString()}</span>
+                      <span className="text-[9px] text-red-500">{t('general.maj')} {s.majority.toLocaleString()}</span>
                     </div>
-                    <span className="text-[10px] font-semibold text-slate-500 ml-2">{s.winner === 'Conservative' ? 'CON' : s.winner === 'Labour' ? 'LAB' : s.winner.slice(0, 3).toUpperCase()} GAIN</span>
+                    <span className="text-[10px] font-semibold text-slate-500 ml-2">
+                      {s.winner === 'Conservative'
+                        ? t('general.con')
+                        : s.winner === 'Labour'
+                          ? t('general.lab')
+                          : s.winner === 'Liberal Democrat'
+                            ? t('general.libdem')
+                            : s.winner === 'SNP'
+                              ? t('general.snp')
+                              : s.winner.slice(0, 3).toUpperCase()}
+                      {' '}{t('general.gain')}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -162,8 +173,8 @@ export default function LeftSidebar() {
             ))}
           </div>
           <div className="mt-2 pt-2 border-t border-slate-100 flex justify-between text-[10px] text-slate-400">
-            <span>6 parties shown</span>
-            <span>{TOTAL} constituencies · 2015</span>
+            <span>{t('general.partiesShown').replace('{n}', '6')}</span>
+            <span>{TOTAL} {t('general.constituencies')} · 2015</span>
           </div>
         </div>
 

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { Search, Globe, X, MapPin } from 'lucide-react'
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { translateParty } from '@/lib/i18n/translations'
 import constituencyData, { PARTY_COLORS_2015 } from '@/lib/data/constituencies-2015-real'
 
 interface SearchResult {
@@ -158,7 +159,7 @@ export default function Header({ onSelectConstituency }: HeaderProps) {
                         <MapPin className="w-3 h-3" />
                         <span>{result.county}</span>
                         <span>·</span>
-                        <span>{result.winner}</span>
+                        <span>{translateParty(result.winner, lang as any)}</span>
                       </div>
                     </div>
                   </button>
@@ -182,7 +183,7 @@ export default function Header({ onSelectConstituency }: HeaderProps) {
           >
             <Globe className="w-4 h-4" />
             <span className="text-xs font-medium">
-              {lang === 'zh' ? 'EN' : '中文'}
+              {lang === 'zh' ? t('header.switchLang') : '中文'}
             </span>
           </button>
         </div>
