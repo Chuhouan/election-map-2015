@@ -6,8 +6,8 @@ import Providers from '@/components/providers/Providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'BBC-Style 2024 UK General Election Interactive Visualization',
-  description: 'A professional election visualization platform inspired by BBC election coverage',
+  title: '2015 英国大选 · 结果地图 - UK General Election Visualization',
+  description: '2015 年英国大选交互式可视化平台，展示 650 个选区的选举结果、得票分布、政党席位等完整数据',
 }
 
 export default function RootLayout({
@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="zh-CN">
       <body className={`${inter.className} bg-background-primary text-white antialiased`}>
         <Providers>
           {children}

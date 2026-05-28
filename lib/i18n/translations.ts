@@ -325,7 +325,7 @@ export const translations = {
     'general.con': '保守党',
     'general.lab': '工党',
     'general.libdem': '自民党',
-    'general.snp': 'SNP',
+    'general.snp': '苏格兰民族党',
   },
 
   en: {

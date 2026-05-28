@@ -5,6 +5,7 @@ import { Search, Globe, X, MapPin } from 'lucide-react'
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { translateParty } from '@/lib/i18n/translations'
+import { translateConName } from '@/lib/data/name-translations'
 import constituencyData, { PARTY_COLORS_2015 } from '@/lib/data/constituencies-2015-real'
 
 interface SearchResult {
@@ -26,6 +27,7 @@ export default function Header({ onSelectConstituency }: HeaderProps) {
   const searchRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const { t, lang, toggleLang } = useLanguage()
+  const isZh = lang === 'zh'
 
   // 搜索逻辑（基于真实2015数据）
   const performSearch = useCallback((query: string) => {
@@ -87,7 +89,7 @@ export default function Header({ onSelectConstituency }: HeaderProps) {
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-3">
                 <div className="flex items-center space-x-2">
-                  <div className="bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded tracking-wider">UK</div>
+                  <div className="bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded tracking-wider">{isZh ? '英国' : 'UK'}</div>
                   <div className="h-5 w-px bg-slate-300"></div>
                   <h1 className="text-base font-bold text-slate-800 tracking-tight">
                     {t('header.title')}
@@ -154,10 +156,10 @@ export default function Header({ onSelectConstituency }: HeaderProps) {
                       <div className="w-3 h-3 rounded-full" style={{ backgroundColor: result.color }}></div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-slate-800 truncate">{result.name}</div>
+                      <div className="text-sm font-medium text-slate-800 truncate">{isZh ? translateConName(result.name) : result.name}</div>
                       <div className="text-xs text-slate-500 flex items-center space-x-2">
                         <MapPin className="w-3 h-3" />
-                        <span>{result.county}</span>
+                        <span>{isZh ? translateConName(result.county) : result.county}</span>
                         <span>·</span>
                         <span>{translateParty(result.winner, lang as any)}</span>
                       </div>

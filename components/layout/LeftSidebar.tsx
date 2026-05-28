@@ -1,6 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { translateConName } from '@/lib/data/name-translations'
 import constituencyData from '@/lib/data/constituencies-2015-real'
 import { PARTY_COLORS_2015 } from '@/lib/data/constituencies-2015-real'
 import { Target, Shield, Zap } from 'lucide-react'
@@ -9,7 +10,8 @@ const TOTAL = 650
 const MAJORITY = 326
 
 export default function LeftSidebar() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
+  const isZh = lang === 'zh'
 
   // Compute party stats from real data
   const partyStats = (() => {
@@ -108,7 +110,7 @@ export default function LeftSidebar() {
                 {top3.map((s, i) => (
                   <div key={i} className="flex items-center justify-between text-[11px] bg-red-50 rounded-md px-2.5 py-1.5">
                     <div className="min-w-0 flex-1">
-                      <span className="font-medium text-slate-700 truncate block">{s.name}</span>
+                      <span className="font-medium text-slate-700 truncate block">{isZh ? translateConName(s.name) : s.name}</span>
                       <span className="text-[9px] text-red-500">{t('general.maj')} {s.majority.toLocaleString()}</span>
                     </div>
                     <span className="text-[10px] font-semibold text-slate-500 ml-2">

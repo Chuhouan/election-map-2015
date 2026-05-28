@@ -30,11 +30,7 @@ export default function FilterPanel() {
 
   const getPartyDisplay = (party: string) => {
     if (lang === 'zh') return translateParty(party, 'zh')
-    const shortNames: Record<string, string> = {
-      'Conservative': 'Con', 'Labour': 'Lab', 'Liberal Democrat': 'Lib Dem',
-      'SNP': 'SNP', 'UKIP': 'UKIP', 'Green Party': 'Green', 'Others': 'Others',
-    }
-    return shortNames[party] || party
+    return translateParty(party, 'en')
   }
 
   const toggleParty = (party: string) => {

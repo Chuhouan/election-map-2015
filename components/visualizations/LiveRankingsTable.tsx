@@ -3,6 +3,9 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { TrendingUp, TrendingDown, Target, Award, Users, Clock } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { translateParty, translateRegion, type TranslationKey } from '@/lib/i18n/translations'
+import { translateConName } from '@/lib/data/name-translations'
 
 type RankingType = 'swing' | 'majority' | 'turnout' | 'upsets'
 
@@ -17,6 +20,8 @@ interface RankingItem {
 }
 
 export default function LiveRankingsTable() {
+  const { t, lang } = useLanguage()
+  const isZh = lang === 'zh'
   const [activeTab, setActiveTab] = useState<RankingType>('swing')
 
   const rankings: Record<RankingType, RankingItem[]> = {
@@ -62,11 +67,11 @@ export default function LiveRankingsTable() {
     ],
   }
 
-  const tabConfig: Record<RankingType, { label: string; icon: React.ReactNode; unit: string }> = {
-    swing: { label: 'Largest Swings', icon: <TrendingUp className="w-4 h-4" />, unit: '%' },
-    majority: { label: 'Safest Seats', icon: <Target className="w-4 h-4" />, unit: '' },
-    turnout: { label: 'Highest Turnout', icon: <Users className="w-4 h-4" />, unit: '%' },
-    upsets: { label: 'Biggest Upsets', icon: <Award className="w-4 h-4" />, unit: '' },
+  const tabConfig: Record<RankingType, { labelKey: TranslationKey; icon: React.ReactNode; unit: string }> = {
+    swing: { labelKey: 'rankings.tab.largestSwings', icon: <TrendingUp className="w-4 h-4" />, unit: '%' },
+    majority: { labelKey: 'rankings.tab.safestSeats', icon: <Target className="w-4 h-4" />, unit: '' },
+    turnout: { labelKey: 'rankings.tab.highestTurnout', icon: <Users className="w-4 h-4" />, unit: '%' },
+    upsets: { labelKey: 'rankings.tab.biggestUpsets', icon: <Award className="w-4 h-4" />, unit: '' },
   }
 
   const getPartyColor = (party: string) => {
@@ -94,9 +99,9 @@ export default function LiveRankingsTable() {
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center">
             <Clock className="w-5 h-5 mr-2 text-blue-400" />
-            <h2 className="font-bold">Live Rankings</h2>
+            <h2 className="font-bold">{t('rankings.title')}</h2>
           </div>
-          <div className="text-sm text-gray-400">Updated 2 min ago</div>
+          <div className="text-sm text-gray-400">{t('rankings.updated')}</div>
         </div>
         
         {/* 标签页切换 */}
@@ -112,7 +117,7 @@ export default function LiveRankingsTable() {
               }`}
             >
               {tabConfig[tab].icon}
-              <span>{tabConfig[tab].label}</span>
+              <span>{t(tabConfig[tab].labelKey)}</span>
             </button>
           ))}
         </div>
@@ -123,17 +128,17 @@ export default function LiveRankingsTable() {
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-800">
-              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Rank</th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Constituency</th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Region</th>
-              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Party</th>
+              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">{t('rankings.rank')}</th>
+              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">{t('rankings.constituency')}</th>
+              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">{t('rankings.region')}</th>
+              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">{t('rankings.party')}</th>
               <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">
-                {tabConfig[activeTab].label.split(' ').pop()}
+                {t(activeTab === 'swing' ? 'rankings.swing' : activeTab === 'majority' ? 'rankings.majority' : activeTab === 'turnout' ? 'tooltip.turnout' : 'rankings.change')}
               </th>
               {activeTab === 'swing' || activeTab === 'upsets' ? (
-                <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Change</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">{t('rankings.change')}</th>
               ) : null}
-              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Status</th>
+              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">{t('rankings.status')}</th>
             </tr>
           </thead>
           <tbody>
@@ -153,15 +158,15 @@ export default function LiveRankingsTable() {
                   </div>
                 </td>
                 <td className="py-3 px-4">
-                  <div className="font-medium">{item.constituency}</div>
+                  <div className="font-medium">{isZh ? translateConName(item.constituency) : item.constituency}</div>
                 </td>
                 <td className="py-3 px-4">
-                  <div className="text-sm text-gray-400">{item.region}</div>
+                  <div className="text-sm text-gray-400">{isZh ? translateRegion(item.region, lang) : item.region}</div>
                 </td>
                 <td className="py-3 px-4">
                   <div className="flex items-center">
                     <div className={`w-3 h-3 ${getPartyColor(item.party)} rounded-full mr-2`}></div>
-                    <span className="text-sm">{item.party}</span>
+                    <span className="text-sm">{translateParty(item.party, lang)}</span>
                   </div>
                 </td>
                 <td className="py-3 px-4">
@@ -193,8 +198,8 @@ export default function LiveRankingsTable() {
                       ? 'bg-yellow-900/30 text-yellow-400'
                       : 'bg-gray-800 text-gray-400'
                   }`}>
-                    {item.status === 'declared' ? 'Declared' : 
-                     item.status === 'close' ? 'Too Close' : 'Undeclared'}
+                    {item.status === 'declared' ? t('filter.declared') : 
+                     item.status === 'close' ? t('filter.tooClose') : t('filter.undeclared')}
                   </div>
                 </td>
               </motion.tr>
@@ -207,10 +212,10 @@ export default function LiveRankingsTable() {
       <div className="px-4 py-3 border-t border-gray-800 bg-black/20">
         <div className="flex items-center justify-between text-sm">
           <div className="text-gray-400">
-            Showing top 8 rankings • Total tracked: {rankings[activeTab].length * 5}
+            {t('rankings.showingTop')}: {rankings[activeTab].length * 5}
           </div>
           <button className="text-blue-400 hover:text-blue-300 transition-colors">
-            View Full Rankings →
+            {t('rankings.viewFull')}
           </button>
         </div>
       </div>

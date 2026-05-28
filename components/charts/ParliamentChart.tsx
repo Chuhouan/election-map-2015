@@ -82,7 +82,7 @@ export default function ParliamentChart() {
           textAnchor="middle"
           className="text-[10px] fill-slate-400"
         >
-          {lang === 'zh' ? '席位' : 'seats'}
+          {t('general.seats')}
         </text>
       </svg>
 

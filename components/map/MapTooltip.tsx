@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { MapPin, TrendingUp, Users, Award } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { translateParty } from '@/lib/i18n/translations'
+import { translateConName } from '@/lib/data/name-translations'
 
 interface MapTooltipProps {
   position: { x: number; y: number }
@@ -74,7 +75,7 @@ export default function MapTooltip({ position, data }: MapTooltipProps) {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center min-w-0">
               <MapPin className="w-4 h-4 mr-2 text-blue-500 flex-shrink-0" />
-              <h3 className="font-bold text-sm text-slate-800 truncate">{data.name}</h3>
+              <h3 className="font-bold text-sm text-slate-800 truncate">{lang === 'zh' ? translateConName(data.name) : data.name}</h3>
             </div>
             <div
               className="w-3 h-3 rounded-full flex-shrink-0 ml-2"

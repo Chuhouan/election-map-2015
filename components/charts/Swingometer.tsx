@@ -1,6 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { translateParty } from '@/lib/i18n/translations'
 
 interface SwingometerProps {
   swing: number
@@ -9,12 +11,17 @@ interface SwingometerProps {
 }
 
 export default function Swingometer({ swing = 3.2, fromParty = 'Conservative', toParty = 'Labour' }: SwingometerProps) {
+  const { lang } = useLanguage()
+  const isZh = lang === 'zh'
   const maxSwing = 20
   const swingNormalized = Math.min(Math.max(swing, -maxSwing), maxSwing)
   const angle = (swingNormalized / maxSwing) * 90
 
   const isPositive = swing >= 0
   const swingColor = isPositive ? '#DC241F' : '#0087DC'
+
+  const fromLabel = isZh ? translateParty(fromParty, 'zh') : fromParty
+  const toLabel = isZh ? translateParty(toParty, 'zh') : toParty
 
   return (
     <div className="relative">
@@ -105,13 +112,13 @@ export default function Swingometer({ swing = 3.2, fromParty = 'Conservative', t
         <div className="absolute top-4 left-4 text-xs">
           <div className="flex items-center">
             <div className="w-3 h-3 bg-party-labour rounded-full mr-1"></div>
-            <span className="text-slate-600">{toParty}</span>
+            <span className="text-slate-600">{toLabel}</span>
           </div>
         </div>
 
         <div className="absolute top-4 right-4 text-xs">
           <div className="flex items-center justify-end">
-            <span className="text-slate-600">{fromParty}</span>
+            <span className="text-slate-600">{fromLabel}</span>
             <div className="w-3 h-3 bg-party-conservative rounded-full ml-1"></div>
           </div>
         </div>
@@ -128,7 +135,7 @@ export default function Swingometer({ swing = 3.2, fromParty = 'Conservative', t
           {swing > 0 ? '+' : ''}{swing}%
         </div>
         <div className="text-sm text-slate-500">
-          {isPositive ? `${fromParty} → ${toParty}` : `${toParty} → ${fromParty}`}
+          {isPositive ? `${fromLabel} → ${toLabel}` : `${toLabel} → ${fromLabel}`}
         </div>
       </motion.div>
 

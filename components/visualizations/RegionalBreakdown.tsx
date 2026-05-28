@@ -2,6 +2,8 @@
 
 import { motion } from 'framer-motion'
 import { BarChart3, TrendingUp, Users, Map } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { translateNation, translateParty } from '@/lib/i18n/translations'
 
 interface RegionData {
   name: string
@@ -18,6 +20,9 @@ interface RegionData {
 }
 
 export default function RegionalBreakdown() {
+  const { t, lang } = useLanguage()
+  const isZh = lang === 'zh'
+
   const regions: RegionData[] = [
     {
       name: 'England',
@@ -101,9 +106,9 @@ export default function RegionalBreakdown() {
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <Map className="w-5 h-5 mr-2 text-blue-400" />
-          <h2 className="text-lg font-bold">Regional Breakdown</h2>
+          <h2 className="text-lg font-bold">{t('regional.title')}</h2>
         </div>
-        <div className="text-sm text-gray-400">Live Updates</div>
+        <div className="text-sm text-gray-400">{t('regional.liveUpdates')}</div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -118,10 +123,10 @@ export default function RegionalBreakdown() {
             {/* 区域标题 */}
             <div className="px-4 py-3 border-b border-gray-800 bg-black/20">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-lg">{region.name}</h3>
+                <h3 className="font-bold text-lg">{translateNation(region.name, lang)}</h3>
                 <div className="flex items-center space-x-3">
                   <div className="text-sm text-gray-400">
-                    {region.declared}/{region.totalSeats} declared
+                    {region.declared}/{region.totalSeats} {t('regional.declaredCount')}
                   </div>
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 </div>
@@ -133,18 +138,18 @@ export default function RegionalBreakdown() {
               <div className="mb-4">
                 <h4 className="text-sm font-medium mb-2 flex items-center">
                   <BarChart3 className="w-4 h-4 mr-2" />
-                  Seat Distribution
+                  {t('regional.seatDistribution')}
                 </h4>
                 <div className="space-y-2">
                   {region.seats.map((seat, index) => (
                     <div key={`${region.name}-${seat.party}`} className="flex items-center">
                       <div className="w-24 flex items-center">
                         <div className={`w-3 h-3 ${getPartyColor(seat.party)} rounded-full mr-2`}></div>
-                        <span className="text-sm text-gray-300 truncate">{seat.party}</span>
+                        <span className="text-sm text-gray-300 truncate">{translateParty(seat.party, lang)}</span>
                       </div>
                       <div className="flex-1 ml-2">
                         <div className="flex items-center justify-between text-sm mb-1">
-                          <span className="text-gray-400">{seat.count} seats</span>
+                          <span className="text-gray-400">{seat.count} {t('regional.seatsCount')}</span>
                           <span className={seat.change >= 0 ? 'text-green-400' : 'text-red-400'}>
                             {seat.change >= 0 ? '+' : ''}{seat.change}
                           </span>
@@ -166,7 +171,7 @@ export default function RegionalBreakdown() {
                 <div className="text-center">
                   <div className="flex items-center justify-center text-sm text-gray-400 mb-1">
                     <TrendingUp className="w-4 h-4 mr-1" />
-                    Swing
+                    {t('rankings.swing')}
                   </div>
                   <div className={`text-lg font-bold ${region.swing >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                     {region.swing >= 0 ? '+' : ''}{region.swing}%
@@ -176,13 +181,13 @@ export default function RegionalBreakdown() {
                 <div className="text-center">
                   <div className="flex items-center justify-center text-sm text-gray-400 mb-1">
                     <Users className="w-4 h-4 mr-1" />
-                    Turnout
+                    {t('sidebar.turnoutLabel')}
                   </div>
                   <div className="text-lg font-bold">{region.turnout}%</div>
                 </div>
                 
                 <div className="text-center">
-                  <div className="text-sm text-gray-400 mb-1">Marginals</div>
+                  <div className="text-sm text-gray-400 mb-1">{t('regional.marginals')}</div>
                   <div className="text-lg font-bold text-yellow-400">{region.keyMarginals}</div>
                 </div>
               </div>
@@ -190,7 +195,7 @@ export default function RegionalBreakdown() {
               {/* 进度条 */}
               <div className="mt-4">
                 <div className="flex justify-between text-sm text-gray-400 mb-1">
-                  <span>Declaration Progress</span>
+                  <span>{t('regional.declarationProgress')}</span>
                   <span>{Math.round((region.declared / region.totalSeats) * 100)}%</span>
                 </div>
                 <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
@@ -209,23 +214,23 @@ export default function RegionalBreakdown() {
 
       {/* 总结统计 */}
       <div className="bg-background-tertiary rounded-lg border border-gray-800 p-4">
-        <h4 className="font-medium mb-3">Regional Summary</h4>
+        <h4 className="font-medium mb-3">{t('regional.summary')}</h4>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-sm text-gray-400">Highest Turnout</div>
-            <div className="text-lg font-bold">England (69.2%)</div>
+            <div className="text-sm text-gray-400">{t('regional.summary.highestTurnout')}</div>
+            <div className="text-lg font-bold">{translateNation('England', lang)} (69.2%)</div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-gray-400">Largest Swing</div>
-            <div className="text-lg font-bold text-green-400">England (+3.8%)</div>
+            <div className="text-sm text-gray-400">{t('regional.summary.largestSwing')}</div>
+            <div className="text-lg font-bold text-green-400">{translateNation('England', lang)} (+3.8%)</div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-gray-400">Most Marginals</div>
-            <div className="text-lg font-bold">England (28)</div>
+            <div className="text-sm text-gray-400">{t('regional.summary.mostMarginals')}</div>
+            <div className="text-lg font-bold">{translateNation('England', lang)} (28)</div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-gray-400">Fastest Declarations</div>
-            <div className="text-lg font-bold">Scotland (76%)</div>
+            <div className="text-sm text-gray-400">{t('regional.summary.fastestDeclarations')}</div>
+            <div className="text-lg font-bold">{translateNation('Scotland', lang)} (76%)</div>
           </div>
         </div>
       </div>
