@@ -82,7 +82,7 @@ interface MapPanelProps {
 
 export default function MapPanel({ onSelectConstituency, flyToConstituency }: MapPanelProps) {
   const { t } = useLanguage()
-  const [mapMode, setMapMode] = useState<'seats' | 'margin' | 'turnout'>('seats')
+  const [mapMode, setMapMode] = useState<'seats' | 'margin' | 'turnout' | 'swing'>('seats')
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null)
   const [tooltipData, setTooltipData] = useState<any>(null)
   const [context, setContext] = useState<LeafletContextInterface | null>(null)
