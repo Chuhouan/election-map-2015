@@ -100,7 +100,7 @@ export default function MapPanel({ onSelectConstituency, flyToConstituency }: Ma
 
   // Load boundary GeoJSON data
   useEffect(() => {
-    fetch('/election-map-2015/data/constituency-boundaries-merged.json')
+    fetch('/uk-election-2015/data/constituency-boundaries-merged.json')
       .then(res => res.json())
       .then(data => {
         setBoundaryGeoJSON(data)
