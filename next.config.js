@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+// Rebuild trigger: fix basePath for GitHub Pages deployment
 const nextConfig = {
   reactStrictMode: true,
   output: 'export',
